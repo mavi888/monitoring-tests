@@ -1,0 +1,30 @@
+config:
+  target: 'https://7hx42u5rd7.execute-api.us-east-1.amazonaws.com/dev'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Sustained max load"
+  payload:
+    path: "pizza-order.csv"
+    fields:
+      - "name"
+      - "address"
+      - "pizzas"
+scenarios:
+  - flow:
+    - post:
+        url: "/pedido"
+        json:
+          name: "{{ name }}"
+          address : "{{ address }}"
+          pizzas: "{{ pizzas }}"
+        capture:
+          json: "$.order.orderId"
+          as: "orderId"
+    - think: 10
+    - get:
+        url: "/pedido/{{ orderId }}"

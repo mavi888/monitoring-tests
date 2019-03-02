@@ -1,0 +1,19 @@
+config:
+  target: 'https://7hx42u5rd7.execute-api.us-east-1.amazonaws.com/dev'
+  phases:
+    - duration: 60
+      arrivalRate: 20
+  payload:
+    path: "pizza-order.csv"
+    fields:
+      - "name"
+      - "address"
+      - "pizzas"
+scenarios:
+  - flow:
+    - post:
+        url: "/pedido"
+        json:
+          name: "{{ name }}"
+          address : "{{ address }}"
+          pizzas: "{{ pizzas }}"
