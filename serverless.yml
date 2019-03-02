@@ -1,15 +1,15 @@
-service: pedirPizzas
+service: monitoring-tests
 
 provider:
   name: aws
   runtime: nodejs8.10
-  region: eu-west-1
+
   environment:
     REGION: ${self:provider.region}
     PENDING_ORDER_QUEUE:
       Ref: PendingOrdersQueue
-    PENDING_ORDER_QUEUE_NAME: PendingOrdersQueue
-    COMPLETED_ORDER_TABLE: CompletedOrderTable
+    PENDING_ORDER_QUEUE_NAME: PendingOrdersQueue-dev
+    COMPLETED_ORDER_TABLE: CompletedOrderTable-dev
 
   iamRoleStatements:
     - Effect: "Allow"
@@ -24,7 +24,6 @@ provider:
         - "dynamodb:DeleteItem"
       Resource:
         - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPLETED_ORDER_TABLE}"
-
 
 functions:
   hacerPedido:
@@ -75,9 +74,7 @@ resources:
         KeySchema:
         - AttributeName: "orderId"
           KeyType: "HASH"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.COMPLETED_ORDER_TABLE}
         StreamSpecification:
           StreamViewType: NEW_IMAGE
